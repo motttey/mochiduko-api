@@ -199,8 +199,8 @@ https://gist.github.com/ZipFile/c9ebedb224406f4f11845ab700124362
 https://gist.github.com/upbit/6edda27cb1644e94183291109b8a5fde
 '''
 if __name__ == '__main__':
-    refresh_token = os.environ("REFLESH_TOKEN")
-    user_num = os.environ("USER_NUM")
+    refresh_token = os.environ.get("REFLESH_TOKEN")
+    user_num = os.environ.get("USER_NUM")
 
     if len(args) > 2:
         each_illusts_json, each_years_json, total_stat_json = parse_pixiv(refresh_token, user_num)
