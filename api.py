@@ -202,16 +202,15 @@ if __name__ == '__main__':
     refresh_token = os.environ.get("REFLESH_TOKEN")
     user_num = os.environ.get("USER_NUM")
 
-    if len(args) > 2:
-        each_illusts_json, each_years_json, total_stat_json = parse_pixiv(refresh_token, user_num)
-        download_image_from_pixiv(each_illusts_json)
-        each_illusts_tsne_json = apply_tsne(each_illusts_json)
+    each_illusts_json, each_years_json, total_stat_json = parse_pixiv(refresh_token, user_num)
+    download_image_from_pixiv(each_illusts_json)
+    each_illusts_tsne_json = apply_tsne(each_illusts_json)
 
-        f1 = codecs.open("public/each_illusts.json", "w", "utf-8")
-        json.dump(each_illusts_tsne_json, f1, ensure_ascii=False)
+    f1 = codecs.open("public/each_illusts.json", "w", "utf-8")
+    json.dump(each_illusts_tsne_json, f1, ensure_ascii=False)
 
-        f2 = codecs.open("public/each_years.json", "w", "utf-8")
-        json.dump(each_years_json, f2, ensure_ascii=False)
+    f2 = codecs.open("public/each_years.json", "w", "utf-8")
+    json.dump(each_years_json, f2, ensure_ascii=False)
 
-        f3 = codecs.open("public/total_stat.json", "w", "utf-8")
-        json.dump(total_stat_json, f3, ensure_ascii=False)
+    f3 = codecs.open("public/total_stat.json", "w", "utf-8")
+    json.dump(total_stat_json, f3, ensure_ascii=False)
