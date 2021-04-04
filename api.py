@@ -4,6 +4,14 @@ import json
 import sys
 import csv
 import codecs
+import requests
+import pathlib
+import cv2
+import os
+import numpy as np
+from PIL import Image
+from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
 
 def get_illust_obj(illust):
     return {
@@ -145,6 +153,47 @@ def parse_pixiv(refresh_token, user_num):
     }
     return [ each_illusts, each_years_stat, total_stat ]
 
+def download_image_from_pixiv(each_illusts):
+    target_dir = 'public/thumbs/'
+    if not os.path.exists(target_dir):
+        os.mkdir(target_dir)
+
+    target_list = ['http://embed.pixiv.net/decorate.php?illust_id=' + str(p['id']) + '&mode=sns-automator' for p in each_illusts]
+    path_list = [pathlib.Path(target_dir + str(p['id']) + '.png') for p in each_illusts]
+
+    for target, output in zip(target_list, path_list):
+        print("download:" + str(output))
+
+        response = requests.get(target)
+        image = response.content
+        with open(output, 'wb') as f:
+            f.write(image)
+
+        img = cv2.imread(str(output))
+        resized_img = cv2.resize(img, (128, 128))
+        cv2.imwrite(str(output), resized_img)
+    return
+
+def apply_tsne(each_illusts):
+    target_dir = 'public/thumbs/'
+    path = pathlib.Path(target_dir).glob('*.png')
+
+    path_list = [pathlib.Path(target_dir + str(p['id']) + '.png') for p in each_illusts]
+
+    images = np.concatenate([cv2.resize(cv2.imread(str(p)),(64,64)).flatten().reshape(1,-1) for p in path_list], axis=0)
+
+    # t-SNE適用
+    tsne = TSNE(n_components=3)
+    images_embedded = tsne.fit_transform(images)
+    print(images_embedded)
+
+    for i in range(len(each_illusts)):
+        each_illusts[i]['tsne-X'] = images_embedded[i][0].astype(float)
+        each_illusts[i]['tsne-Y'] = images_embedded[i][1].astype(float)
+        each_illusts[i]['tsne-Z'] = images_embedded[i][2].astype(float)
+
+    return each_illusts
+
 '''
 get reflesh token
 https://gist.github.com/ZipFile/c9ebedb224406f4f11845ab700124362
@@ -157,9 +206,11 @@ if __name__ == '__main__':
 
     if len(args) > 2:
         each_illusts_json, each_years_json, total_stat_json = parse_pixiv(refresh_token, user_num)
+        download_image_from_pixiv(each_illusts_json)
+        each_illusts_tsne_json = apply_tsne(each_illusts_json)
 
         f1 = codecs.open("public/each_illusts.json", "w", "utf-8")
-        json.dump(each_illusts_json, f1, ensure_ascii=False)
+        json.dump(each_illusts_tsne_json, f1, ensure_ascii=False)
 
         f2 = codecs.open("public/each_years.json", "w", "utf-8")
         json.dump(each_years_json, f2, ensure_ascii=False)
