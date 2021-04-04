@@ -1,2 +1,4 @@
 /*.json
  Access-Control-Allow-Origin: *
+/thumbs/*.png
+ Access-Control-Allow-Origin: *
