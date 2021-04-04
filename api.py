@@ -203,6 +203,8 @@ if __name__ == '__main__':
     user_num = os.environ.get("USER_NUM")
 
     each_illusts_json, each_years_json, total_stat_json = parse_pixiv(refresh_token, user_num)
+    each_illusts_json = each_illusts_json[0:300]
+
     download_image_from_pixiv(each_illusts_json)
     each_illusts_tsne_json = apply_tsne(each_illusts_json)
 
