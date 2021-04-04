@@ -145,7 +145,7 @@ def parse_pixiv(refresh_token, user_num):
         })
 
     total_stat = {
-        "total_count": illust_count + manga_count,
+        "total_illusts": illust_count + manga_count,
         "total_views": illust_total_view + manga_total_view,
         "total_bookmarks": illust_total_bookmark + manga_total_bookmark,
         "total_comments": illust_total_comments + illust_total_comments
