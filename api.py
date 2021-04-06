@@ -14,6 +14,8 @@ from sklearn.manifold import TSNE
 
 def get_illust_obj(illust):
     return {
+        "title": illust.title,
+        "date": illust.create_date.split('T')[0],
         "id": illust.id,
         "view": illust.total_view,
         "bookmark": illust.total_bookmarks,
@@ -58,7 +60,6 @@ def parse_pixiv(refresh_token, user_num):
     api.auth(refresh_token=refresh_token)
 
     json_result = api.user_illusts(user_num)
-    print(json_result)
     for illust in json_result.illusts:
         year = illust.create_date.split('-')[0]
         each_years[year].append(illust.id)
