@@ -172,7 +172,7 @@ def download_image_from_pixiv(each_illusts):
         with open(png_path, 'wb') as f:
             f.write(image)
 
-        img = cv2.imread(str(output) + '.webp' )
+        img = cv2.imread(png_path)
         resized_img = cv2.resize(img, (64, 64))
         cv2.imwrite(png_path, resized_img)
 
