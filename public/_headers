@@ -2,3 +2,5 @@
  Access-Control-Allow-Origin: *
 /thumbs/*.png
  Access-Control-Allow-Origin: *
+/thumbs/*.webp
+ Access-Control-Allow-Origin: *
