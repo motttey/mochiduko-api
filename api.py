@@ -159,19 +159,26 @@ def download_image_from_pixiv(each_illusts):
         os.mkdir(target_dir)
 
     target_list = ['http://embed.pixiv.net/decorate.php?illust_id=' + str(p['id']) + '&mode=sns-automator' for p in each_illusts]
-    path_list = [pathlib.Path(target_dir + str(p['id']) + '.png') for p in each_illusts]
+    path_list = [pathlib.Path(target_dir + str(p['id'])) for p in each_illusts]
 
     for target, output in zip(target_list, path_list):
         print("download:" + str(output))
 
         response = requests.get(target)
         image = response.content
-        with open(output, 'wb') as f:
+        png_path = str(output) + '.png'
+        webp_path = str(output) + '.webp'
+
+        with open(png_path, 'wb') as f:
             f.write(image)
 
-        img = cv2.imread(str(output))
-        resized_img = cv2.resize(img, (128, 128))
-        cv2.imwrite(str(output), resized_img)
+        img = cv2.imread(str(output) + '.webp' )
+        resized_img = cv2.resize(img, (64, 64))
+        cv2.imwrite(png_path, resized_img)
+
+        print("convert image to webp:" + str(output))
+        image_webp = Image.open(png_path).convert('RGB')
+        image_webp.save(webp_path, 'webp')
     return
 
 def apply_tsne(each_illusts):
