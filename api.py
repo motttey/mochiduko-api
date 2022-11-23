@@ -40,6 +40,7 @@ def parse_pixiv(refresh_token, user_num):
     each_illusts = []
 
     each_years = {
+        "2022": [],
         "2021": [],
         "2020": [],
         "2019": [],
@@ -211,7 +212,7 @@ if __name__ == '__main__':
     user_num = os.environ.get("USER_NUM")
 
     each_illusts_json, each_years_json, total_stat_json = parse_pixiv(refresh_token, user_num)
-    each_illusts_json = each_illusts_json[0:300]
+    each_illusts_json = each_illusts_json[0:500]
 
     download_image_from_pixiv(each_illusts_json)
     each_illusts_tsne_json = apply_tsne(each_illusts_json)
