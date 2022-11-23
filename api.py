@@ -174,6 +174,10 @@ def download_image_from_pixiv(each_illusts):
             f.write(image)
 
         img = cv2.imread(png_path)
+
+        # 画像がなければcontinue
+        if img is None: continue
+
         resized_img = cv2.resize(img, (128, 128))
         cv2.imwrite(png_path, resized_img)
 
