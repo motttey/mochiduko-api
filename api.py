@@ -81,6 +81,7 @@ def parse_pixiv(refresh_token, user_num):
             next_result = api.user_illusts(**next_qs)
 
             for illust in next_result.illusts:
+                print(illust)
                 year = illust.create_date.split('-')[0]
                 each_years[year].append(illust.id)
 
@@ -188,10 +189,7 @@ def download_image_from_pixiv(each_illusts):
 
 def apply_tsne(each_illusts):
     target_dir = 'public/thumbs/'
-    path = pathlib.Path(target_dir).glob('*.png')
-
-    path_list = [pathlib.Path(target_dir + str(p['id']) + '.png') for p in each_illusts]
-
+    path_list = [pathlib.Path(target_dir + str(p['id']) + '.png') for p in each_illusts]        
     images = np.concatenate([cv2.resize(cv2.imread(str(p)),(64,64)).flatten().reshape(1,-1) for p in path_list], axis=0)
 
     # t-SNE適用
