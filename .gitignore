@@ -127,3 +127,13 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# public
+public/*.json
+public/thumbs
+
+# .vscode
+.vscode
+
+# pixiv_authはgistから取得したものを使うので除外
+pixiv_auth.py
