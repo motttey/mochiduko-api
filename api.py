@@ -58,7 +58,7 @@ def parse_pixiv(refresh_token, user_num):
     }
 
     # 非公開イラストのリスト
-    ignored_id_list = [101336714, 95871491]
+    ignored_id_list = [95871491, 101336714]
 
     api = AppPixivAPI()
     api.auth(refresh_token=refresh_token)
@@ -218,11 +218,12 @@ https://gist.github.com/upbit/6edda27cb1644e94183291109b8a5fde
 if __name__ == '__main__':
     refresh_token = os.environ.get("REFLESH_TOKEN")
     user_num = os.environ.get("USER_NUM")
+    max_illust_num = 500
 
     each_illusts_json, each_years_json, total_stat_json = parse_pixiv(refresh_token, user_num)
-    each_illusts_json = each_illusts_json[0:500]
+    each_illusts_json = each_illusts_json[0:max_illust_num]
 
-    download_image_from_pixiv(each_illusts_json)
+    download_image_from_pixiv(each_illusts_json[0:max_illust_num])
     each_illusts_tsne_json = apply_tsne(each_illusts_json)
 
     f1 = codecs.open("public/each_illusts.json", "w", "utf-8")
