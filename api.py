@@ -142,7 +142,7 @@ def parse_pixiv(refresh_token, user_num):
             next_url = next_result.next_url
             print(next_url)
         except Exception as e:
-            print("end")
+            print(e)
             flag = 1
 
     each_years_stat = []
