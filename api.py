@@ -1,7 +1,6 @@
 # -*- Coding: utf-8 -*-
 from pixivpy3 import *
 import json
-import csv
 import codecs
 import requests
 import pathlib
@@ -9,7 +8,6 @@ import cv2
 import os
 import numpy as np
 from PIL import Image
-from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 
 def get_illust_obj(illust):
