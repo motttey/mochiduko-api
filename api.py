@@ -38,6 +38,7 @@ def parse_pixiv(refresh_token, user_num):
     each_illusts = []
 
     each_years = {
+        "2023": [],
         "2022": [],
         "2021": [],
         "2020": [],
