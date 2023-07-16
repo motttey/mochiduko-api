@@ -49,8 +49,8 @@ if __name__ == '__main__':
     illust_data = response_data["data"]
     output_array = []
     for index, illust in enumerate(illust_data):
-        fname = "generated_1_{0}.jpg"
-        urllib.request.urlretrieve(illust["url"], fname.format(index))
+        fname = "generated_1_{0}.jpg",format(index)
+        urllib.request.urlretrieve(illust["url"], "public/" + fname)
         output_array.append({
               "image": fname,
               "url": illust["url"]
