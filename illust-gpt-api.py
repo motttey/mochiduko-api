@@ -31,7 +31,8 @@ def generate_image_response(prompt=''):
 	return response_data
 
 if __name__ == '__main__':
-    response_data = generate_image_response(prompt='Doraemon in Japanese Cartoon Style')
+    prompt='Doraemon (a cute robot cat) in Japanese Cartoon Style'
+    response_data = generate_image_response(prompt=prompt)
     illust_data = response_data["data"]
     output_array = []
     for index, illust in enumerate(illust_data):
@@ -45,5 +46,6 @@ if __name__ == '__main__':
     f1 = codecs.open("public/generated_doraemon_illust.json", "w", "utf-8")
     json.dump({
           "created": response_data,
+          "prompt": prompt,
           "data": output_array
     }, f1, ensure_ascii=False)
