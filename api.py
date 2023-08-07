@@ -194,7 +194,11 @@ def download_image_from_pixiv(each_illusts):
 
 def apply_tsne(each_illusts):
     target_dir = 'public/thumbs/'
-    path_list = [pathlib.Path(target_dir + str(p['id']) + '.png') for p in each_illusts]        
+
+    # 画像がダウンロードできたものだけに絞る
+    filtered_illusts = [illust for illust in each_illusts if pathlib.Path(target_dir + str(p['id']) + '.png').exists()]
+    path_list = [pathlib.Path(target_dir + str(illust['id']) + '.png') for illust in filtered_illusts]       
+
     images = np.concatenate([cv2.resize(cv2.imread(str(p)),(64,64)).flatten().reshape(1,-1) for p in path_list], axis=0)
 
     # t-SNE適用
