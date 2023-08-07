@@ -35,26 +35,11 @@ def parse_pixiv(refresh_token, user_id):
     manga_total_bookmark = 0
     manga_total_comments = 0
 
+    # 取得したイラストを格納するarray
     each_illusts = []
 
-    each_years = {
-        "2023": [],
-        "2022": [],
-        "2021": [],
-        "2020": [],
-        "2019": [],
-        "2018": [],
-        "2017": [],
-        "2016": [],
-        "2015": [],
-        "2014": [],
-        "2013": [],
-        "2012": [],
-        "2011": [],
-        "2010": [],
-        "2009": [],
-        "2008": []
-    }
+    # 年ごとに実績を格納するdict
+    each_years = {}
 
     # 非公開イラストのリスト
     ignored_id_list = [95871491, 101336714]
@@ -65,6 +50,8 @@ def parse_pixiv(refresh_token, user_id):
     json_result = api.user_illusts(user_id)
     for illust in json_result.illusts:
         year = illust.create_date.split('-')[0]
+        if year not in each_years:
+            each_years[year] = []
         each_years[year].append(illust.id)
         # print(illust)
 
