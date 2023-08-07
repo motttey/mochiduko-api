@@ -24,7 +24,7 @@ def get_illust_obj(illust):
         "height": illust.height
     }
 
-def parse_pixiv(refresh_token, user_num):
+def parse_pixiv(refresh_token, user_id):
     illust_count = 0
     illust_total_view = 0
     illust_total_bookmark = 0
@@ -62,7 +62,7 @@ def parse_pixiv(refresh_token, user_num):
     api = AppPixivAPI()
     api.auth(refresh_token=refresh_token)
 
-    json_result = api.user_illusts(user_num)
+    json_result = api.user_illusts(user_id)
     for illust in json_result.illusts:
         year = illust.create_date.split('-')[0]
         each_years[year].append(illust.id)
@@ -103,7 +103,7 @@ def parse_pixiv(refresh_token, user_num):
             print("end")
             flag = 1
 
-    json_result_manga = api.user_illusts(user_num, type="manga")
+    json_result_manga = api.user_illusts(user_id, type="manga")
     for manga in json_result_manga.illusts:
         year = manga.create_date.split('-')[0]
 
@@ -220,10 +220,10 @@ https://gist.github.com/upbit/6edda27cb1644e94183291109b8a5fde
 '''
 if __name__ == '__main__':
     refresh_token = os.environ.get("REFLESH_TOKEN")
-    user_num = os.environ.get("USER_NUM")
+    user_id = os.environ.get("USER_NUM")
     max_illust_num = 500
 
-    each_illusts_json, each_years_json, total_stat_json = parse_pixiv(refresh_token, user_num)
+    each_illusts_json, each_years_json, total_stat_json = parse_pixiv(refresh_token, user_id)
     each_illusts_json = each_illusts_json[0:max_illust_num]
 
     download_image_from_pixiv(each_illusts_json[0:max_illust_num])
