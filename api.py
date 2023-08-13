@@ -1,4 +1,3 @@
-# -*- Coding: utf-8 -*-
 from pixivpy3 import *
 import json
 import codecs
@@ -152,7 +151,11 @@ def download_image_from_pixiv(each_illusts):
     if not os.path.exists(target_dir):
         os.mkdir(target_dir)
 
-    target_list = ['http://embed.pixiv.net/decorate.php?illust_id=' + str(p['id']) + '&mode=sns-automator' for p in each_illusts]
+    target_list = [
+        'http://embed.pixiv.net/decorate.php?illust_id=' + str(p['id']) + '&mode=sns-automator' 
+        for p in each_illusts
+    ]
+
     path_list = [pathlib.Path(target_dir + str(p['id'])) for p in each_illusts]
 
     for target, output in zip(target_list, path_list):
@@ -200,6 +203,11 @@ def apply_tsne(each_illusts):
 
     return each_illusts
 
+def output_file(fname, content):
+    output_dir_prefix = "public/"
+    f = codecs.open(output_dir_prefix + fname, "w", "utf-8")
+    json.dump(content, f, ensure_ascii=False)
+
 '''
 get reflesh token
 https://gist.github.com/ZipFile/c9ebedb224406f4f11845ab700124362
@@ -216,11 +224,8 @@ if __name__ == '__main__':
     download_image_from_pixiv(each_illusts_json[0:max_illust_num])
     each_illusts_tsne_json = apply_tsne(each_illusts_json)
 
-    f1 = codecs.open("public/each_illusts.json", "w", "utf-8")
-    json.dump(each_illusts_tsne_json, f1, ensure_ascii=False)
+    output_file("each_illusts.json", each_illusts_tsne_json)
 
-    f2 = codecs.open("public/each_years.json", "w", "utf-8")
-    json.dump(each_years_json, f2, ensure_ascii=False)
+    output_file("each_years.json", each_years_json)
 
-    f3 = codecs.open("public/total_stat.json", "w", "utf-8")
-    json.dump(total_stat_json, f3, ensure_ascii=False)
+    output_file("total_stat.json", total_stat_json)
