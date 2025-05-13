@@ -40,14 +40,15 @@ def parse_pixiv(refresh_token, user_id):
     # 年ごとに実績を格納するdict
     each_years = {}
 
-    # 非公開イラストのリスト
-    ignored_id_list = [95871491, 101336714]
-
     api = AppPixivAPI()
     api.auth(refresh_token=refresh_token)
 
     json_result = api.user_illusts(user_id)
     for illust in json_result.illusts:
+        # 非公開イラストはスキップ
+        if not illust.visible:
+            continue
+
         year = illust.create_date.split('-')[0]
         if year not in each_years:
             each_years[year] = []
@@ -59,10 +60,6 @@ def parse_pixiv(refresh_token, user_id):
         illust_total_bookmark = illust_total_bookmark + illust.total_bookmarks
         illust_total_comments = illust_total_comments + illust.total_comments
 
-        # 公開イラストに絞る
-        if int(illust.id) not in ignored_id_list:
-            each_illusts.append(get_illust_obj(illust))
-
     next_url = json_result.next_url
     flag = 0
 
@@ -72,6 +69,10 @@ def parse_pixiv(refresh_token, user_id):
             next_result = api.user_illusts(**next_qs)
 
             for illust in next_result.illusts:
+                # 非公開イラストはスキップ
+                if not illust.visible:
+                    continue
+
                 year = illust.create_date.split('-')[0]
                 if year not in each_years:
                     each_years[year] = []
@@ -81,9 +82,6 @@ def parse_pixiv(refresh_token, user_id):
                 illust_total_view = illust_total_view + illust.total_view
                 illust_total_bookmark = illust_total_bookmark + illust.total_bookmarks
                 illust_total_comments = illust_total_comments + illust.total_comments
-
-                if int(illust.id) not in ignored_id_list:
-                    each_illusts.append(get_illust_obj(illust))
 
             next_url = next_result.next_url
             print(next_url)
