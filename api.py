@@ -73,6 +73,8 @@ def parse_pixiv(refresh_token, user_id):
 
             for illust in next_result.illusts:
                 year = illust.create_date.split('-')[0]
+                if year not in each_years:
+                    each_years[year] = []
                 each_years[year].append(illust.id)
 
                 illust_count = illust_count + 1
@@ -113,7 +115,8 @@ def parse_pixiv(refresh_token, user_id):
 
             for manga in next_result.illusts:
                 year = manga.create_date.split('-')[0]
-
+                if year not in each_years:
+                    each_years[year] = []
                 each_years[year].append(manga.id)
                 # for page in manga.meta_pages:
                 #    each_years[year].append(page)
@@ -224,8 +227,7 @@ if __name__ == '__main__':
     download_image_from_pixiv(each_illusts_json[0: max_illust_num])
     each_illusts_tsne_json = apply_tsne(each_illusts_json)
 
+    # output file on server
     output_file("each_illusts.json", each_illusts_tsne_json)
-
     output_file("each_years.json", each_years_json)
-
     output_file("total_stat.json", total_stat_json)
