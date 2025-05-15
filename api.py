@@ -172,14 +172,38 @@ def apply_tsne(each_illusts):
 
     # 画像がダウンロードできたものだけに絞る
     filtered_illusts = [illust for illust in each_illusts if pathlib.Path(target_dir + str(illust['id']) + '.png').exists()]
-    path_list = [pathlib.Path(target_dir + str(illust['id']) + '.png') for illust in filtered_illusts]       
+    path_list = [pathlib.Path(target_dir + str(illust['id']) + '.png') for illust in filtered_illusts]
 
-    images = np.concatenate([cv2.resize(cv2.imread(str(p)),(64,64)).flatten().reshape(1,-1) for p in path_list], axis=0)
+    valid_paths = []
+    valid_illusts = []
+    image_list = []
+    for i, p in enumerate(path_list):
+        try:
+            img = cv2.imread(str(p))
+            if img is None:
+                print(f"Error: Could not read image at {p}")
+                continue
+            resized_img = cv2.resize(img, (64, 64)).flatten().reshape(1, -1)
+            image_list.append(resized_img)
+            valid_paths.append(p)
+            valid_illusts.append(filtered_illusts[i])
+        except Exception as e:
+            print(f"Error processing image {p}: {e}")
+            continue
+
+    if not image_list:
+        print(format("No valid images found.{0}", p))
+        return each_illusts
+
+    images = np.concatenate(image_list, axis=0)
 
     # t-SNE適用
     tsne = TSNE(n_components=3)
     images_embedded = tsne.fit_transform(images)
     print(images_embedded)
+
+    # each_illustsをvalid_illustsで更新
+    each_illusts = valid_illusts
 
     for i in range(len(each_illusts)):
         each_illusts[i]['tsne-X'] = images_embedded[i][0].astype(float)
