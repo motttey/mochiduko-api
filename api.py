@@ -201,7 +201,7 @@ https://gist.github.com/upbit/6edda27cb1644e94183291109b8a5fde
 if __name__ == '__main__':
     refresh_token = os.environ.get("REFLESH_TOKEN")
     user_id = os.environ.get("USER_NUM")
-    max_illust_num = 600
+    max_illust_num = 500
 
     each_illusts_json, each_years_json, total_stat_json = parse_pixiv(refresh_token, user_id)
     each_illusts_json = each_illusts_json[0: max_illust_num]
