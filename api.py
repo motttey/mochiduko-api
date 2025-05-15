@@ -23,7 +23,7 @@ def get_illust_obj(illust):
         "height": illust.height
     }
 
-def process_illusts(json_result, each_years, illust_count, illust_total_view, illust_total_bookmark, illust_total_comments):
+def process_illusts(json_result, each_years, illust_count, illust_total_view, illust_total_bookmark, illust_total_comments, each_illusts):
     for illust in json_result.illusts:
         # 非公開イラストはスキップ
         if not illust.visible:
@@ -39,6 +39,8 @@ def process_illusts(json_result, each_years, illust_count, illust_total_view, il
         illust_total_view = illust_total_view + illust.total_view
         illust_total_bookmark = illust_total_bookmark + illust.total_bookmarks
         illust_total_comments = illust_total_comments + illust.total_comments
+
+        each_illusts.append(get_illust_obj(illust))
     return each_years, illust_count, illust_total_view, illust_total_bookmark, illust_total_comments
 
 def process_manga(json_result, each_years, manga_count, manga_total_view, manga_total_bookmark, manga_total_comments, each_illusts):
@@ -78,7 +80,7 @@ def parse_pixiv(refresh_token, user_id):
     api.auth(refresh_token=refresh_token)
 
     json_result = api.user_illusts(user_id)
-    each_years, illust_count, illust_total_view, illust_total_bookmark, illust_total_comments = process_illusts(json_result, each_years, illust_count, illust_total_view, illust_total_bookmark, illust_total_comments)
+    each_years, illust_count, illust_total_view, illust_total_bookmark, illust_total_comments = process_illusts(json_result, each_years, illust_count, illust_total_view, illust_total_bookmark, illust_total_comments, each_illusts)
 
     next_url = json_result.next_url
     flag = 0
@@ -88,7 +90,7 @@ def parse_pixiv(refresh_token, user_id):
             next_qs = api.parse_qs(next_url)
             next_result = api.user_illusts(**next_qs)
 
-            each_years, illust_count, illust_total_view, illust_total_bookmark, illust_total_comments = process_illusts(next_result, each_years, illust_count, illust_total_view, illust_total_bookmark, illust_total_comments)
+            each_years, illust_count, illust_total_view, illust_total_bookmark, illust_total_comments = process_illusts(next_result, each_years, illust_count, illust_total_view, illust_total_bookmark, illust_total_comments, each_illusts)
 
             next_url = next_result.next_url
             print(next_url)
