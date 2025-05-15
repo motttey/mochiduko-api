@@ -23,6 +23,40 @@ def get_illust_obj(illust):
         "height": illust.height
     }
 
+def process_illusts(json_result, each_years, illust_count, illust_total_view, illust_total_bookmark, illust_total_comments):
+    for illust in json_result.illusts:
+        # 非公開イラストはスキップ
+        if not illust.visible:
+            continue
+
+        year = illust.create_date.split('-')[0]
+        if year not in each_years:
+            each_years[year] = []
+        each_years[year].append(illust.id)
+        # print(illust)
+
+        illust_count = illust_count + 1
+        illust_total_view = illust_total_view + illust.total_view
+        illust_total_bookmark = illust_total_bookmark + illust.total_bookmarks
+        illust_total_comments = illust_total_comments + illust.total_comments
+    return each_years, illust_count, illust_total_view, illust_total_bookmark, illust_total_comments
+
+def process_manga(json_result, each_years, manga_count, manga_total_view, manga_total_bookmark, manga_total_comments, each_illusts):
+    for manga in json_result.illusts:
+        year = manga.create_date.split('-')[0]
+
+        each_years[year].append(manga.id)
+        # for page in manga.meta_pages:
+        #     each_years[year].append(page)
+
+        manga_count = manga_count + 1
+        manga_total_view = manga_total_view + manga.total_view
+        manga_total_bookmark = manga_total_bookmark + manga.total_bookmarks
+        manga_total_comments = manga_total_comments + manga.total_comments
+
+        each_illusts.append(get_illust_obj(manga))
+    return each_years, manga_count, manga_total_view, manga_total_bookmark, manga_total_comments, each_illusts
+
 def parse_pixiv(refresh_token, user_id):
     illust_count = 0
     illust_total_view = 0
@@ -44,21 +78,7 @@ def parse_pixiv(refresh_token, user_id):
     api.auth(refresh_token=refresh_token)
 
     json_result = api.user_illusts(user_id)
-    for illust in json_result.illusts:
-        # 非公開イラストはスキップ
-        if not illust.visible:
-            continue
-
-        year = illust.create_date.split('-')[0]
-        if year not in each_years:
-            each_years[year] = []
-        each_years[year].append(illust.id)
-        # print(illust)
-
-        illust_count = illust_count + 1
-        illust_total_view = illust_total_view + illust.total_view
-        illust_total_bookmark = illust_total_bookmark + illust.total_bookmarks
-        illust_total_comments = illust_total_comments + illust.total_comments
+    each_years, illust_count, illust_total_view, illust_total_bookmark, illust_total_comments = process_illusts(json_result, each_years, illust_count, illust_total_view, illust_total_bookmark, illust_total_comments)
 
     next_url = json_result.next_url
     flag = 0
@@ -68,20 +88,7 @@ def parse_pixiv(refresh_token, user_id):
             next_qs = api.parse_qs(next_url)
             next_result = api.user_illusts(**next_qs)
 
-            for illust in next_result.illusts:
-                # 非公開イラストはスキップ
-                if not illust.visible:
-                    continue
-
-                year = illust.create_date.split('-')[0]
-                if year not in each_years:
-                    each_years[year] = []
-                each_years[year].append(illust.id)
-
-                illust_count = illust_count + 1
-                illust_total_view = illust_total_view + illust.total_view
-                illust_total_bookmark = illust_total_bookmark + illust.total_bookmarks
-                illust_total_comments = illust_total_comments + illust.total_comments
+            each_years, illust_count, illust_total_view, illust_total_bookmark, illust_total_comments = process_illusts(next_result, each_years, illust_count, illust_total_view, illust_total_bookmark, illust_total_comments)
 
             next_url = next_result.next_url
             print(next_url)
@@ -90,19 +97,7 @@ def parse_pixiv(refresh_token, user_id):
             flag = 1
 
     json_result_manga = api.user_illusts(user_id, type="manga")
-    for manga in json_result_manga.illusts:
-        year = manga.create_date.split('-')[0]
-
-        each_years[year].append(manga.id)
-        # for page in manga.meta_pages:
-        #     each_years[year].append(page)
-
-        manga_count = manga_count + 1
-        manga_total_view = manga_total_view + manga.total_view
-        manga_total_bookmark = manga_total_bookmark + manga.total_bookmarks
-        manga_total_comments = manga_total_comments + manga.total_comments
-
-        each_illusts.append(get_illust_obj(manga))
+    each_years, manga_count, manga_total_view, manga_total_bookmark, manga_total_comments, each_illusts = process_manga(json_result_manga, each_years, manga_count, manga_total_view, manga_total_bookmark, manga_total_comments, each_illusts)
 
     next_url = json_result_manga.next_url
     flag = 0
@@ -111,20 +106,7 @@ def parse_pixiv(refresh_token, user_id):
             next_qs = api.parse_qs(next_url)
             next_result = api.user_illusts(**next_qs)
 
-            for manga in next_result.illusts:
-                year = manga.create_date.split('-')[0]
-                if year not in each_years:
-                    each_years[year] = []
-                each_years[year].append(manga.id)
-                # for page in manga.meta_pages:
-                #    each_years[year].append(page)
-
-                manga_count = manga_count + 1
-                manga_total_view = manga_total_view + manga.total_view
-                manga_total_bookmark = manga_total_bookmark + manga.total_bookmarks
-                manga_total_comments = manga_total_comments + manga.total_comments
-
-                each_illusts.append(get_illust_obj(manga))
+            each_years, manga_count, manga_total_view, manga_total_bookmark, manga_total_comments, each_illusts = process_manga(next_result, each_years, manga_count, manga_total_view, manga_total_bookmark, manga_total_comments, each_illusts)
 
             next_url = next_result.next_url
             print(next_url)
