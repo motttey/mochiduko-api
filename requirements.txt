@@ -5,5 +5,9 @@ PixivPy==3.7.0
 pyparsing==3.2.3
 requests==2.32.3
 scipy==1.15.3
-scikit-learn==1.6.1
 urllib3==2.4.0
+scikit-learn==1.7.1
+torch==2.8.0
+torchvision==0.23.0
+MiniSom==2.3.5
+tqdm==4.67.1

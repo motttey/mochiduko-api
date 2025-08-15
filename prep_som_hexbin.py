@@ -1,8 +1,8 @@
 import os, json, io, pathlib
 from typing import List, Dict
 import requests
-from PIL import Image
 import numpy as np
+from PIL import Image
 from tqdm import tqdm
 
 import torch
@@ -13,9 +13,9 @@ from torchvision.models import resnet50, ResNet50_Weights
 from minisom import MiniSom
 from sklearn.preprocessing import StandardScaler
 
-OUT_DIR = pathlib.Path("som_hexbin_example")
-THUMBS_DIR = OUT_DIR / "thumbs"
-DATA_JSON = OUT_DIR / "data.json"
+OUT_DIR = pathlib.Path("public")
+THUMBS_DIR = OUT_DIR / "thumbnails"
+DATA_JSON = OUT_DIR / "som_data.json"
 
 THUMB_SIZE = 160  # 正方のサムネイルサイズ(px)
 SOM_W, SOM_H = 30, 30  # SOMのグリッドサイズ（大きくするとより密に並ぶ）
@@ -115,7 +115,7 @@ def main():
 
     # BMU（勝者ニューロン）座標を取り出し→可視化座標にマッピング
     coords = []
-    for i, x in enumerate(X):
+    for _i, x in enumerate(X):
         r, c = som.winner(x)  # (row, col) 0-based
         # [0,1] に正規化してD3側で幅高さにスケール
         u = (c + 0.5) / SOM_W

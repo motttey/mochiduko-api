@@ -1,3 +1,3 @@
 [build]
   publish = "public/"
-  command = "pip install -r requirements.txt && python api.py"
+  command = "pip install -r requirements.txt && python api.py && prep_som_hexbin.py"

@@ -132,7 +132,7 @@ def parse_pixiv(refresh_token, user_id):
     return [ each_illusts, each_years_stat, total_stat ]
 
 def download_image_from_pixiv(each_illusts):
-    target_dir = 'public/thumbs/'
+    target_dir = 'public/thumbnails/'
     if not os.path.exists(target_dir):
         os.mkdir(target_dir)
 
