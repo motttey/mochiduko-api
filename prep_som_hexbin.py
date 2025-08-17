@@ -17,8 +17,8 @@ OUT_DIR = pathlib.Path("public")
 THUMBS_DIR = OUT_DIR / "thumbnails"
 DATA_JSON = OUT_DIR / "som_data.json"
 
-THUMB_SIZE = 160  # 正方のサムネイルサイズ(px)
-SOM_W, SOM_H = 30, 30  # SOMのグリッドサイズ（大きくするとより密に並ぶ）
+THUMB_SIZE = 160
+SOM_W, SOM_H = 20, 20  # SOMのグリッドサイズ（大きくするとより密に並ぶ）
 
 os.makedirs(THUMBS_DIR, exist_ok=True)
 
@@ -61,7 +61,7 @@ def build_feature_extractor():
             x = transform(img).unsqueeze(0).to(device)
             _ = model(x)
             feat = layer_output['feat'][0]
-            return feat  # shape (2048,)
+            return feat
 
     return extract
 
@@ -108,8 +108,15 @@ def main():
     X = StandardScaler().fit_transform(X)
 
     # SOM 学習
-    som = MiniSom(SOM_H, SOM_W, X.shape[1], sigma=1.2, learning_rate=0.5,
-                  neighborhood_function='gaussian', random_seed=42)
+    som = MiniSom(
+        SOM_H,
+        SOM_W,
+        X.shape[1],
+        sigma=1.0,
+        learning_rate=0.5,
+        neighborhood_function='gaussian'
+    )
+
     som.random_weights_init(X)
     som.train_random(X, num_iteration=min(5000, 100 * len(X)))  # ざっくり
 
