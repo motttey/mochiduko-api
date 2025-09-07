@@ -18,7 +18,7 @@ THUMBS_DIR = OUT_DIR / "thumbnails"
 DATA_JSON = OUT_DIR / "som_data.json"
 
 THUMB_SIZE = 160
-SOM_W, SOM_H = 20, 20  # SOMのグリッドサイズ（大きくするとより密に並ぶ）
+SOM_W, SOM_H = 15, 15  # SOMのグリッドサイズ（大きくするとより密に並ぶ）
 
 os.makedirs(THUMBS_DIR, exist_ok=True)
 
@@ -36,7 +36,7 @@ def fetch_image(url: str) -> Image.Image:
 # -------- 画像→埋め込みベクトル --------
 def build_feature_extractor():
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    weights = ResNet50_Weights.IMAGENET1K_V2
+    weights = ResNet50_Weights.DEFAULT
     model = resnet50(weights=weights)
     model.eval().to(device)
     # 平均プーリング層直前まで取得するフック
