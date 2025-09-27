@@ -17,7 +17,7 @@ OUT_DIR = pathlib.Path("public")
 THUMBS_DIR = OUT_DIR / "thumbnails"
 DATA_JSON = OUT_DIR / "som_data.json"
 
-THUMB_SIZE = 160
+THUMB_SIZE = 100
 SOM_W, SOM_H = 15, 15  # SOMのグリッドサイズ（大きくするとより密に並ぶ）
 
 os.makedirs(THUMBS_DIR, exist_ok=True)
@@ -50,8 +50,8 @@ def build_feature_extractor():
     model.layer4.register_forward_hook(hook_fn)
 
     transform = T.Compose([
-        T.Resize(256),
-        T.CenterCrop(224),
+        T.Resize(128),
+        T.CenterCrop(11),
         T.ToTensor(),
         T.Normalize(mean=weights.transforms().mean, std=weights.transforms().std),
     ])
@@ -65,7 +65,6 @@ def build_feature_extractor():
 
     return extract
 
-# -------- メイン --------
 def main():
     with open('public/each_illusts.json') as f:
         items: List[Dict] = json.load(f)
@@ -118,13 +117,13 @@ def main():
     )
 
     som.random_weights_init(X)
-    som.train_random(X, num_iteration=min(5000, 100 * len(X)))  # ざっくり
+    som.train_random(X, num_iteration=min(5000, 100 * len(X)))
 
     # BMU（勝者ニューロン）座標を取り出し→可視化座標にマッピング
     coords = []
     for _i, x in enumerate(X):
         r, c = som.winner(x)  # (row, col) 0-based
-        # [0,1] に正規化してD3側で幅高さにスケール
+        # [0,1] に正規化
         u = (c + 0.5) / SOM_W
         v = (r + 0.5) / SOM_H
         coords.append((u, v))
