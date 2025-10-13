@@ -4,3 +4,5 @@
  Access-Control-Allow-Origin: *
 /thumbs/*.webp
  Access-Control-Allow-Origin: *
+/thumbnails/*.jpg
+ Access-Control-Allow-Origin: *
