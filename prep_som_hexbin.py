@@ -1,6 +1,5 @@
-import os, json, io, pathlib
+import json, pathlib
 from typing import List, Dict
-import requests
 import numpy as np
 from PIL import Image
 from tqdm import tqdm
@@ -12,26 +11,15 @@ from torchvision.models import resnet50, ResNet50_Weights
 # SOM
 from minisom import MiniSom
 from sklearn.preprocessing import StandardScaler
+from image_assets import source_image_path
 
 OUT_DIR = pathlib.Path("public")
-THUMBS_DIR = OUT_DIR / "thumbnails"
+THUMBS_DIR = OUT_DIR / "thumbs"
 DATA_JSON = OUT_DIR / "som_data.json"
 
 THUMB_SIZE = 100
-SOM_W, SOM_H = 15, 15  # SOMのグリッドサイズ（大きくするとより密に並ぶ）
-
-os.makedirs(THUMBS_DIR, exist_ok=True)
-
-# -------- 画像ダウンロード（Referer 必須） --------
-def fetch_image(url: str) -> Image.Image:
-    headers = {
-        "Referer": "https://www.pixiv.net/",  # i.pximg.netで必須
-        "User-Agent": "Mozilla/5.0"
-    }
-    r = requests.get(url, headers=headers, timeout=20)
-    r.raise_for_status()
-    img = Image.open(io.BytesIO(r.content)).convert("RGB")
-    return img
+SOM_W, SOM_H = 14, 14  # SOMのグリッドサイズ（大きくするとより密に並ぶ）
+SOM_MAX_ITERATIONS = 4000
 
 # -------- 画像→埋め込みベクトル --------
 def build_feature_extractor():
@@ -69,14 +57,17 @@ def main():
     with open('public/each_illusts.json') as f:
         items: List[Dict] = json.load(f)
 
+    THUMBS_DIR.mkdir(parents=True, exist_ok=True)
     extractor = build_feature_extractor()
     features = []
     outputs = []
 
-    for it in tqdm(items, desc="download & embed"):
+    for it in tqdm(items, desc="embed"):
         try:
-            img = fetch_image(it["url"])
-        except Exception as e:
+            # api.pyで一度だけ取得した元画像を使い、再ダウンロードしない。
+            with Image.open(source_image_path(it["id"])) as source:
+                img = source.convert("RGB")
+        except OSError as e:
             print(f"skip {it.get('id')} ({e})")
             continue
 
@@ -117,7 +108,7 @@ def main():
     )
 
     som.random_weights_init(X)
-    som.train_random(X, num_iteration=min(5000, 100 * len(X)))
+    som.train_random(X, num_iteration=min(SOM_MAX_ITERATIONS, 100 * len(X)))
 
     # BMU（勝者ニューロン）座標を取り出し→可視化座標にマッピング
     coords = []

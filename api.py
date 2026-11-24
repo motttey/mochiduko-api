@@ -8,6 +8,7 @@ import os
 import numpy as np
 from PIL import Image
 from sklearn.manifold import TSNE
+from image_assets import download_source_image
 
 def get_illust_obj(illust):
     return {
@@ -132,39 +133,32 @@ def parse_pixiv(refresh_token, user_id):
     return [ each_illusts, each_years_stat, total_stat ]
 
 def download_image_from_pixiv(each_illusts):
-    target_dir = 'public/thumbs/'
-    if not os.path.exists(target_dir):
-        os.mkdir(target_dir)
+    target_dir = pathlib.Path('public/thumbs')
+    target_dir.mkdir(parents=True, exist_ok=True)
+    downloaded_ids = set()
 
-    target_list = [
-        'http://embed.pixiv.net/decorate.php?illust_id=' + str(p['id']) + '&mode=sns-automator' 
-        for p in each_illusts
-    ]
+    for illust in each_illusts:
+        illust_id = illust['id']
+        if illust_id in downloaded_ids:
+            continue
 
-    path_list = [pathlib.Path(target_dir + str(p['id'])) for p in each_illusts]
+        png_path = target_dir / f'{illust_id}.png'
+        webp_path = target_dir / f'{illust_id}.webp'
+        png_path.unlink(missing_ok=True)
+        webp_path.unlink(missing_ok=True)
+        print(f"download: {illust_id}")
 
-    for target, output in zip(target_list, path_list):
-        print("download:" + str(output))
+        try:
+            image = download_source_image(illust_id, illust['url'])
+        except (requests.RequestException, OSError) as e:
+            print(f"skip {illust_id} ({e})")
+            continue
 
-        response = requests.get(target)
-        image = response.content
-        png_path = str(output) + '.png'
-        webp_path = str(output) + '.webp'
-
-        with open(png_path, 'wb') as f:
-            f.write(image)
-
-        img = cv2.imread(png_path)
-
-        # 画像がなければcontinue
-        if img is None: continue
-
-        resized_img = cv2.resize(img, (128, 128))
-        cv2.imwrite(png_path, resized_img)
-
-        print("convert image to webp:" + str(output))
-        image_webp = Image.open(png_path).convert('RGB')
-        image_webp.save(webp_path, 'webp')
+        # t-SNE用・表示用の画像は、SOMと共有する元画像から生成する。
+        resized_image = image.resize((128, 128), Image.Resampling.BILINEAR)
+        resized_image.save(png_path, 'PNG')
+        resized_image.save(webp_path, 'WEBP')
+        downloaded_ids.add(illust_id)
     return
 
 def apply_tsne(each_illusts):

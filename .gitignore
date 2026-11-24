@@ -137,3 +137,6 @@ public/thumbs
 
 # pixiv_authはgistから取得したものを使うので除外
 pixiv_auth.py
+
+# test.pyはテスト用のコードなので除外
+tests/
