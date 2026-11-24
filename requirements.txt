@@ -7,7 +7,7 @@ requests==2.34.2
 scipy==1.18.1
 urllib3==2.8.0
 scikit-learn==1.9.1
-torch==2.14.1
+torch==2.15.0
 torchvision==0.29.1
 MiniSom==2.3.6
 tqdm==4.70.1

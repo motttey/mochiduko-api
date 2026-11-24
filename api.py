@@ -132,7 +132,7 @@ def parse_pixiv(refresh_token, user_id):
     return [ each_illusts, each_years_stat, total_stat ]
 
 def download_image_from_pixiv(each_illusts):
-    target_dir = 'public/thumbnails/'
+    target_dir = 'public/thumbs/'
     if not os.path.exists(target_dir):
         os.mkdir(target_dir)
 
@@ -192,13 +192,21 @@ def apply_tsne(each_illusts):
             continue
 
     if not image_list:
-        print(format("No valid images found.{0}", p))
+        print(f"No valid images found in {target_dir}; skipping t-SNE.")
+        return each_illusts
+
+    if len(image_list) == 1:
+        print("At least two valid images are required; skipping t-SNE.")
         return each_illusts
 
     images = np.concatenate(image_list, axis=0)
 
     # t-SNE適用
-    tsne = TSNE(n_components=3)
+    tsne = TSNE(
+        n_components=3,
+        perplexity=min(30, len(image_list) - 1),
+        init='pca' if len(image_list) >= 3 else 'random',
+    )
     images_embedded = tsne.fit_transform(images)
     print(images_embedded)
 
